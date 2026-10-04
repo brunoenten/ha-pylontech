@@ -1,10 +1,17 @@
 {
   "entity": {
     "binary_sensor": {
-      "alarm": { "default": "mdi:battery-check", "state": { "on": "mdi:battery-alert" } }
+      "alarm": {
+        "default": "mdi:battery-check",
+        "state": {
+          "on": "mdi:battery-alert"
+        }
+      }
     },
     "button": {
-      "sync_time": { "default": "mdi:clock-check-outline" }
+      "sync_time": {
+        "default": "mdi:clock-check-outline"
+      }
     },
     "sensor": {
       "state": {
@@ -13,13 +20,25 @@
           "charging": "mdi:battery-charging",
           "discharging": "mdi:battery-minus",
           "idle": "mdi:battery",
-          "balancing": "mdi:scale-balance"
+          "balancing": "mdi:scale-balance",
+          "error": "mdi:battery-alert"
         }
       },
-      "module_count": { "default": "mdi:battery-multiple" },
-      "cycles": { "default": "mdi:battery-sync" },
-      "cell_voltage_delta": { "default": "mdi:delta" },
-      "bms_time": { "default": "mdi:clock-outline" }
+      "module_count": {
+        "default": "mdi:battery-multiple"
+      },
+      "cycles": {
+        "default": "mdi:battery-sync"
+      },
+      "cell_voltage_delta": {
+        "default": "mdi:delta"
+      },
+      "bms_time": {
+        "default": "mdi:clock-outline"
+      },
+      "soh": {
+        "default": "mdi:heart-pulse"
+      }
     }
   }
 }

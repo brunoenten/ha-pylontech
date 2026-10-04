@@ -1,0 +1,22 @@
+pwr
+@
+Power Volt   Curr   Tempr  Tlow   Thigh  Vlow   Vhigh  Base.St  Volt.St  Curr.St  Temp.St  Coulomb  Time                 B.V.St   B.T.St   MosTempr M.T.St  
+1     49370  -1524  33900  29200  29600  3289   3294   SysError Normal   Normal   Normal   11%      2026-10-04 21:34:00  Normal   Normal  32000    Normal  
+2     49396  0      32000  28000  29000  3291   3294   Idle     Normal   Normal   Normal   86%      2026-10-04 21:34:18  Normal   Normal   -        -       
+3     49402  0      32000  28000  28000  3292   3295   Idle     Normal   Normal   Normal   73%      2026-10-04 21:34:10  Normal   Normal   -        -       
+4     -      -      -      -      -      -      -      Absent   -        -        -        -        -                    -        -       
+5     49410  -2824  32000  27000  28000  3289   3302   Dischg   Normal   Normal   Normal   92%      2026-10-04 21:34:09  Normal   Normal   -        -       
+6     49391  0      31000  27000  28000  3290   3294   Idle     Normal   Normal   Normal   74%      2026-10-04 21:34:45  Normal   Normal   -        -       
+7     49381  0      32000  27000  27000  3290   3293   Idle     Normal   Normal   Normal   77%      2026-10-04 21:34:17  Normal   Normal   -        -       
+8     49373  3808   31000  27000  28000  3288   3294   Charge   Normal   Normal   Normal   28%      2026-10-04 21:34:13  Normal   Normal   -        -       
+9     -      -      -      -      -      -      -      Absent   -        -        -        -        -                    -        -       
+10    -      -      -      -      -      -      -      Absent   -        -        -        -        -                    -        -       
+11    -      -      -      -      -      -      -      Absent   -        -        -        -        -                    -        -       
+12    -      -      -      -      -      -      -      Absent   -        -        -        -        -                    -        -       
+13    -      -      -      -      -      -      -      Absent   -        -        -        -        -                    -        -       
+14    -      -      -      -      -      -      -      Absent   -        -        -        -        -                    -        -       
+15    -      -      -      -      -      -      -      Absent   -        -        -        -        -                    -        -       
+16    -      -      -      -      -      -      -      Absent   -        -        -        -        -                    -        -       
+Command completed successfully
+$$
+pylon>

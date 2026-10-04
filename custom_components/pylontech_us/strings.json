@@ -39,28 +39,67 @@
   },
   "entity": {
     "binary_sensor": {
-      "alarm": { "name": "Alarm" }
+      "alarm": {
+        "name": "Alarm"
+      }
     },
     "button": {
-      "sync_time": { "name": "Sync BMS clock" }
+      "sync_time": {
+        "name": "Sync BMS clock"
+      }
     },
     "sensor": {
-      "voltage": { "name": "Voltage" },
-      "current": { "name": "Current" },
-      "power": { "name": "Power" },
-      "soc": { "name": "State of charge" },
-      "temperature": { "name": "Temperature" },
-      "temperature_low": { "name": "Lowest temperature" },
-      "temperature_high": { "name": "Highest temperature" },
-      "mos_temperature": { "name": "MOSFET temperature" },
-      "cell_voltage_low": { "name": "Lowest cell voltage" },
-      "cell_voltage_high": { "name": "Highest cell voltage" },
-      "cell_voltage_delta": { "name": "Cell voltage delta" },
-      "module_count": { "name": "Modules" },
-      "bms_time": { "name": "BMS clock" },
-      "cycles": { "name": "Cycles" },
-      "cell_voltage": { "name": "Cell {cell} voltage" },
-      "cell_temperature": { "name": "Cell {cell} temperature" },
+      "voltage": {
+        "name": "Voltage"
+      },
+      "current": {
+        "name": "Current"
+      },
+      "power": {
+        "name": "Power"
+      },
+      "soc": {
+        "name": "State of charge"
+      },
+      "temperature": {
+        "name": "Temperature"
+      },
+      "temperature_low": {
+        "name": "Lowest temperature"
+      },
+      "temperature_high": {
+        "name": "Highest temperature"
+      },
+      "mos_temperature": {
+        "name": "MOSFET temperature"
+      },
+      "cell_voltage_low": {
+        "name": "Lowest cell voltage"
+      },
+      "cell_voltage_high": {
+        "name": "Highest cell voltage"
+      },
+      "cell_voltage_delta": {
+        "name": "Cell voltage delta"
+      },
+      "module_count": {
+        "name": "Modules"
+      },
+      "bms_time": {
+        "name": "BMS clock"
+      },
+      "cycles": {
+        "name": "Cycles"
+      },
+      "soh": {
+        "name": "State of health"
+      },
+      "cell_voltage": {
+        "name": "Cell {cell} voltage"
+      },
+      "cell_temperature": {
+        "name": "Cell {cell} temperature"
+      },
       "state": {
         "name": "State",
         "state": {
@@ -68,7 +107,8 @@
           "discharging": "Discharging",
           "idle": "Idle",
           "balancing": "Balancing",
-          "other": "Other"
+          "other": "Other",
+          "error": "Error"
         }
       }
     }

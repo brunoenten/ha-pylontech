@@ -10,6 +10,8 @@ from .const import DOMAIN
 from .coordinator import PylontechCoordinator
 from .models import ModuleData
 
+_VIA_DEVICE_ID_SUPPORTED = "via_device_id" in DeviceInfo.__annotations__
+
 
 def stack_id(coordinator: PylontechCoordinator) -> str:
     entry = coordinator.config_entry
@@ -30,16 +32,20 @@ def stack_device_info(coordinator: PylontechCoordinator) -> DeviceInfo:
 def module_device_info(coordinator: PylontechCoordinator, address: int) -> DeviceInfo:
     module = coordinator.data.modules.get(address) if coordinator.data else None
     info = module.info if module else None
-    return DeviceInfo(
+    device_info = DeviceInfo(
         identifiers={(DOMAIN, f"{stack_id(coordinator)}_{address}")},
-        name=f"{info.device_name if info and info.device_name else 'Pylontech'} #{address}",
+        name=f"Pylontech module {address}",
         manufacturer="Pylontech",
         model=info.device_name if info else None,
         serial_number=info.barcode if info else None,
         sw_version=info.firmware if info else None,
         hw_version=info.board_version if info else None,
-        via_device=(DOMAIN, stack_id(coordinator)),
     )
+    if _VIA_DEVICE_ID_SUPPORTED and coordinator.stack_device_id:
+        device_info["via_device_id"] = coordinator.stack_device_id
+    else:
+        device_info["via_device"] = (DOMAIN, stack_id(coordinator))
+    return device_info
 
 
 class PylontechStackEntity(CoordinatorEntity[PylontechCoordinator]):

@@ -1,0 +1,21 @@
+bat 1
+@
+Battery  Volt     Curr     Tempr    Base State   Volt. State  Curr. State  Temp. State  SOC          Coulomb      BAL         
+0        3349     1784     28400    Charge       Normal       Normal       Normal       14%          6313 mAH      N
+1        3349     1784     28400    Charge       Normal       Normal       Normal       14%          6313 mAH      N
+2        3349     1784     28400    Charge       Normal       Normal       Normal       14%          6313 mAH      N
+3        3348     1784     28400    Charge       Normal       Normal       Normal       14%          6313 mAH      N
+4        3348     1784     28400    Charge       Normal       Normal       Normal       14%          6313 mAH      N
+5        3350     1784     28200    Charge       Normal       Normal       Normal       14%          6313 mAH      N
+6        3349     1784     28200    Charge       Normal       Normal       Normal       14%          6313 mAH      N
+7        3349     1784     28200    Charge       Normal       Normal       Normal       14%          6313 mAH      N
+8        3349     1784     28200    Charge       Normal       Normal       Normal       14%          6313 mAH      N
+9        3349     1784     28200    Charge       Normal       Normal       Normal       14%          6313 mAH      N
+10       3349     1784     28900    Charge       Normal       Normal       Normal       14%          6313 mAH      N
+11       3349     1784     28900    Charge       Normal       Normal       Normal       14%          6313 mAH      N
+12       3349     1784     28900    Charge       Normal       Normal       Normal       14%          6313 mAH      N
+13       3348     1784     28900    Charge       Normal       Normal       Normal       14%          6313 mAH      N
+14       3348     1784     28900    Charge       Normal       Normal       Normal       14%          6313 mAH      N
+Command completed successfully
+$$
+pylon>

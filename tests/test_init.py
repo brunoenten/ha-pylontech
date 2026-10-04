@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import pytest
 from homeassistant.config_entries import ConfigEntryState
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import device_registry as dr
@@ -10,7 +11,7 @@ from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.pylontech_us.const import CONF_BAUD_RATE, CONF_SERIAL_PORT, DOMAIN
 
-UNIQUE_ID = "PPTBH02400710243"
+UNIQUE_ID = "PPTCR03100C22779"
 
 
 async def _setup(hass: HomeAssistant) -> MockConfigEntry:
@@ -26,38 +27,71 @@ async def _setup(hass: HomeAssistant) -> MockConfigEntry:
     return entry
 
 
-async def test_setup_creates_devices_and_entities(hass: HomeAssistant, mock_console) -> None:
-    entry = await _setup(hass)
-    assert entry.state is ConfigEntryState.LOADED
-
-    devices = {
+def _devices(hass: HomeAssistant, entry: MockConfigEntry) -> dict[str, dr.DeviceEntry]:
+    return {
         identifier: device
         for device in dr.async_entries_for_config_entry(dr.async_get(hass), entry.entry_id)
         for _, identifier in device.identifiers
     }
-    assert set(devices) == {UNIQUE_ID, f"{UNIQUE_ID}_1", f"{UNIQUE_ID}_2"}
+
+
+def _state(hass: HomeAssistant, platform: str, unique_id: str) -> str:
+    entity_id = er.async_get(hass).async_get_entity_id(platform, DOMAIN, unique_id)
+    assert entity_id is not None, unique_id
+    return hass.states.get(entity_id).state
+
+
+async def test_setup_single_module(hass: HomeAssistant, mock_console) -> None:
+    entry = await _setup(hass)
+    assert entry.state is ConfigEntryState.LOADED
+
+    devices = _devices(hass, entry)
+    assert set(devices) == {UNIQUE_ID, f"{UNIQUE_ID}_1"}
     module = devices[f"{UNIQUE_ID}_1"]
     assert module.via_device_id == devices[UNIQUE_ID].id
-    assert module.serial_number == "PPTBH02400710243"
+    assert module.serial_number == UNIQUE_ID
+    assert module.model == "US2000C"
 
-    entities = er.async_get(hass)
-    soc_id = entities.async_get_entity_id("sensor", DOMAIN, f"{UNIQUE_ID}_soc")
-    assert hass.states.get(soc_id).state == "66.5"
-    module_soc = entities.async_get_entity_id("sensor", DOMAIN, f"{UNIQUE_ID}_1_soc")
-    assert hass.states.get(module_soc).state == "67"
-    state_id = entities.async_get_entity_id("sensor", DOMAIN, f"{UNIQUE_ID}_1_state")
-    assert hass.states.get(state_id).state == "discharging"
-    cycles_id = entities.async_get_entity_id("sensor", DOMAIN, f"{UNIQUE_ID}_1_cycles")
-    assert hass.states.get(cycles_id).state == "430"
-    alarm_id = entities.async_get_entity_id("binary_sensor", DOMAIN, f"{UNIQUE_ID}_1_alarm")
-    assert hass.states.get(alarm_id).state == "off"
+    assert _state(hass, "sensor", f"{UNIQUE_ID}_soc") == "14.0"
+    assert _state(hass, "sensor", f"{UNIQUE_ID}_1_soc") == "14"
+    assert _state(hass, "sensor", f"{UNIQUE_ID}_1_voltage") == "50.231"
+    assert _state(hass, "sensor", f"{UNIQUE_ID}_1_state") == "charging"
+    assert _state(hass, "sensor", f"{UNIQUE_ID}_1_cycles") == "1157"
+    assert _state(hass, "sensor", f"{UNIQUE_ID}_1_soh") == "88"
+    assert _state(hass, "binary_sensor", f"{UNIQUE_ID}_1_alarm") == "off"
 
-    cell_id = entities.async_get_entity_id("sensor", DOMAIN, f"{UNIQUE_ID}_1_cell_voltage_3")
-    assert cell_id is not None
-    assert entities.async_get(cell_id).disabled_by is not None
+    cell_id = er.async_get(hass).async_get_entity_id(
+        "sensor", DOMAIN, f"{UNIQUE_ID}_1_cell_voltage_14"
+    )
+    assert er.async_get(hass).async_get(cell_id).disabled_by is not None
 
     assert await hass.config_entries.async_unload(entry.entry_id)
     assert entry.state is ConfigEntryState.NOT_LOADED
+
+
+@pytest.mark.parametrize("pwr_fixture", ["pwr_stack.txt"])
+async def test_setup_stack(hass: HomeAssistant, mock_console) -> None:
+    entry = await _setup(hass)
+    addresses = [1, 2, 3, 5, 6, 7, 8]
+    devices = _devices(hass, entry)
+    assert set(devices) == {UNIQUE_ID, *(f"{UNIQUE_ID}_{a}" for a in addresses)}
+    assert devices[f"{UNIQUE_ID}_3"].serial_number is None
+    assert devices[f"{UNIQUE_ID}_3"].name == "Pylontech module 3"
+    assert _state(hass, "sensor", f"{UNIQUE_ID}_module_count") == "7"
+    assert _state(hass, "sensor", f"{UNIQUE_ID}_1_state") == "error"
+    assert _state(hass, "binary_sensor", f"{UNIQUE_ID}_1_alarm") == "on"
+    assert _state(hass, "binary_sensor", f"{UNIQUE_ID}_2_alarm") == "off"
+    assert _state(hass, "sensor", f"{UNIQUE_ID}_5_state") == "discharging"
+    assert _state(hass, "sensor", f"{UNIQUE_ID}_3_soc") == "73"
+
+    registry = er.async_get(hass)
+    assert registry.async_get_entity_id("sensor", DOMAIN, f"{UNIQUE_ID}_1_soh")
+    assert registry.async_get_entity_id("sensor", DOMAIN, f"{UNIQUE_ID}_3_soh") is None
+    assert registry.async_get_entity_id("sensor", DOMAIN, f"{UNIQUE_ID}_3_cell_voltage_0")
+
+    sent = [call.args[0] for call in mock_console.call_args_list]
+    assert "bat 3" in sent
+    assert not any(cmd.startswith(("info ", "stat ")) for cmd in sent)
 
 
 async def test_sync_time_button(hass: HomeAssistant, mock_console) -> None:

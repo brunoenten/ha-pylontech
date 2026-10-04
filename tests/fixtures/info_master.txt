@@ -1,0 +1,22 @@
+info
+@
+Device address      : 1
+Manufacturer        : Pylon
+Device name         : US2000C
+Board version       : V10R04
+Main Soft version   : B67.5.0
+Soft  version       : V1.7
+Boot  version       : V2.0
+Comm version        : V2.0
+Release Date        : 20-12-11
+Barcode             : PPTCR03100C22779
+
+Specification       : 48V/50AH
+Cell Number         : 15
+Max Dischg Curr     : -90000mA
+Max Charge Curr     : 90000mA
+EPONPort rate       : 1200
+Console Port rate   : 115200
+Command completed successfully
+$$
+pylon>

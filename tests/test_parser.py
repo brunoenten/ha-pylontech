@@ -1,4 +1,4 @@
-"""Tests for console output parsers."""
+"""Tests for console output parsers, using output captured from a US2000C."""
 
 from datetime import datetime
 
@@ -18,34 +18,55 @@ from .conftest import load_fixture
 
 
 def test_parse_pwr() -> None:
-    rows = parse_pwr(load_fixture("pwr_sample.txt"))
-    assert list(rows) == [1, 2]
+    rows = parse_pwr(load_fixture("pwr.txt"))
+    assert list(rows) == [1]
     row = rows[1]
-    assert row.voltage == 49.735
-    assert row.current == -1.25
-    assert row.temperature == 21.0
-    assert row.temperature_low == 20.0
-    assert row.cell_voltage_low == 3.313
-    assert row.cell_voltage_high == 3.318
-    assert row.base_state == "Dischg"
-    assert row.soc == 67
-    assert row.time == datetime(2026, 10, 4, 15, 0, 0)
+    assert row.voltage == 50.231
+    assert row.current == 1.784
+    assert row.temperature == 33.7
+    assert row.temperature_low == 28.2
+    assert row.temperature_high == 28.9
+    assert row.cell_voltage_low == 3.348
+    assert row.cell_voltage_high == 3.349
+    assert row.base_state == "Charge"
+    assert row.soc == 14
+    assert row.time == datetime(2026, 10, 4, 20, 32, 13)
     assert row.bv_state == "Normal"
-    assert row.mos_temperature == 22.0
+    assert row.mos_temperature == 31.7
+    assert row.mt_state == "Normal"
     assert row.alarms == {}
-    assert row.power == round(49.735 * -1.25, 1)
+    assert row.power == round(50.231 * 1.784, 1)
+
+
+def test_parse_pwr_stack() -> None:
+    rows = parse_pwr(load_fixture("pwr_stack.txt"))
+    assert list(rows) == [1, 2, 3, 5, 6, 7, 8]
+    assert rows[1].base_state == "SysError"
+    assert rows[1].alarms == {"base_state": "SysError"}
+    assert rows[5].current == -2.824
+    assert rows[8].base_state == "Charge"
+    assert rows[2].mos_temperature is None
+    assert rows[2].mt_state is None
+    assert rows[2].alarms == {}
+
+
+def test_parse_bat_slave() -> None:
+    cells = parse_bat(load_fixture("bat_slave.txt"))
+    assert len(cells) == 15
+    assert cells[0].soc == 73
+    assert cells[0].coulomb == 32.911
 
 
 def test_parse_pwr_alarm() -> None:
-    raw = load_fixture("pwr_sample.txt").replace(
-        "Dischg   Normal   Normal   Normal   67%", "Dischg   Normal   Normal   HighT    67%", 1
+    raw = load_fixture("pwr.txt").replace(
+        "Charge   Normal   Normal   Normal   14%", "Charge   Normal   Normal   HighT    14%", 1
     )
     assert parse_pwr(raw)[1].alarms == {"temp_state": "HighT"}
 
 
 def test_parse_pwr_without_header() -> None:
     with pytest.raises(ParseError):
-        parse_pwr("pwr\r\n$$\r\npylon>")
+        parse_pwr(load_fixture("pwr_single.txt"))
 
 
 def test_parse_pwr_legacy_columns() -> None:
@@ -63,17 +84,17 @@ def test_parse_pwr_legacy_columns() -> None:
     assert row.mos_temperature is None
 
 
-def test_parse_info() -> None:
-    info = parse_info(load_fixture("info_sample.txt"))
+@pytest.mark.parametrize("fixture", ["info.txt", "info_master.txt"])
+def test_parse_info(fixture: str) -> None:
+    info = parse_info(load_fixture(fixture))
     assert info.address == 1
     assert info.device_name == "US2000C"
-    assert info.barcode == "PPTBH02400710243"
+    assert info.barcode == "PPTCR03100C22779"
+    assert info.board_version == "V10R04"
     assert info.cell_count == 15
-    assert info.main_soft_version == "B66.6"
-    assert info.soft_version == "V2.4"
-    assert info.firmware == "B66.6 / V2.4"
-    assert info.max_discharge_current == -100.0
-    assert info.max_charge_current == 102.0
+    assert info.firmware == "B67.5.0 / V1.7"
+    assert info.max_discharge_current == -90.0
+    assert info.max_charge_current == 90.0
 
 
 def test_parse_info_invalid() -> None:
@@ -82,27 +103,29 @@ def test_parse_info_invalid() -> None:
 
 
 def test_parse_bat() -> None:
-    cells = parse_bat(load_fixture("bat_sample.txt"))
+    cells = parse_bat(load_fixture("bat.txt"))
     assert len(cells) == 15
-    cell = cells[3]
-    assert cell.index == 3
-    assert cell.voltage == 3.318
-    assert cell.current == -1.25
-    assert cell.temperature == 20.0
-    assert cell.base_state == "Dischg"
+    cell = cells[5]
+    assert cell.index == 5
+    assert cell.voltage == 3.35
+    assert cell.current == 1.784
+    assert cell.temperature == 28.2
+    assert cell.base_state == "Charge"
     assert cell.volt_state == "Normal"
-    assert cell.soc == 67
-    assert cell.coulomb == 33.562
-    assert cell.balancing is True
-    assert cells[0].balancing is False
+    assert cell.temp_state == "Normal"
+    assert cell.soc == 14
+    assert cell.coulomb == 6.313
+    assert cell.balancing is False
 
 
 def test_parse_stat() -> None:
-    assert parse_stat(load_fixture("stat_sample.txt")).cycles == 430
+    stat = parse_stat(load_fixture("stat.txt"))
+    assert stat.cycles == 1157
+    assert stat.soh == 88
 
 
 def test_parse_time() -> None:
-    assert parse_time(load_fixture("time_sample.txt")) == datetime(2026, 10, 4, 15, 0, 0)
+    assert parse_time(load_fixture("time.txt")) == datetime(2026, 10, 4, 20, 32, 39)
 
 
 def test_format_time_command() -> None:

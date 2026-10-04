@@ -33,7 +33,7 @@ async def test_user_flow(hass: HomeAssistant, mock_console) -> None:
     assert result["type"] is FlowResultType.CREATE_ENTRY
     assert result["title"] == "Pylontech US2000C"
     assert result["data"] == {CONF_SERIAL_PORT: PORT, CONF_BAUD_RATE: 115200}
-    assert result["result"].unique_id == "PPTBH02400710243"
+    assert result["result"].unique_id == "PPTCR03100C22779"
 
 
 async def test_user_flow_cannot_connect(hass: HomeAssistant) -> None:

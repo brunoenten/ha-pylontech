@@ -4,11 +4,11 @@ Local polling integration for Pylontech US-series batteries (US2000C, US3000C, U
 
 ## Features
 
-- One config entry per console port (stack). Linked modules behind the master appear as separate devices.
+- One config entry per console port (stack). Linked modules behind the master appear as separate devices. The master console only answers `info` and `stat` for itself, so serial number, firmware, cycle count and state of health are only available for the master module.
 - Stack sensors: voltage, total current and power, average state of charge, lowest/highest cell voltage and temperature, module count, BMS clock.
-- Module sensors: voltage, current, power, state of charge, temperatures, lowest/highest cell voltage and delta, state (charging/discharging/idle), cycle count.
+- Module sensors: voltage, current, power, state of charge, temperatures, lowest/highest cell voltage and delta, state (charging/discharging/idle/error), cycle count and state of health (master only).
 - Per-cell voltage and temperature sensors (disabled by default).
-- Alarm binary sensor per module (on when any status field is not `Normal`).
+- Alarm binary sensor per module (on when any status field is not `Normal`, or the module reports `SysError`).
 - Button to sync the BMS clock with Home Assistant.
 - Diagnostics include the raw console output.
 

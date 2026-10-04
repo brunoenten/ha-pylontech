@@ -6,6 +6,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 
 NORMAL = "Normal"
+ERROR_STATES = ("SysError", "Error", "Protect")
 
 
 @dataclass
@@ -85,6 +86,7 @@ class PowerRow:
     def alarms(self) -> dict[str, str]:
         """Return status fields that are not Normal."""
         fields = {
+            "base_state": self.base_state if self.base_state in ERROR_STATES else None,
             "volt_state": self.volt_state,
             "curr_state": self.curr_state,
             "temp_state": self.temp_state,
@@ -100,6 +102,7 @@ class StatData:
     """Selected counters from the `stat` command."""
 
     cycles: int | None = None
+    soh: int | None = None
     raw: dict[str, str] = field(default_factory=dict)
 
 

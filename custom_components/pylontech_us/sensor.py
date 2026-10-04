@@ -34,6 +34,7 @@ STATE_MAP = {
     "Dischg": "discharging",
     "Idle": "idle",
     "Balance": "balancing",
+    "SysError": "error",
 }
 STATE_OPTIONS = [*STATE_MAP.values(), "other"]
 
@@ -48,6 +49,7 @@ class StackSensorDescription(SensorEntityDescription):
 @dataclass(frozen=True, kw_only=True)
 class ModuleSensorDescription(SensorEntityDescription):
     value_fn: Callable[[ModuleData], Value]
+    exists_fn: Callable[[ModuleData], bool] = lambda _: True
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -172,6 +174,16 @@ MODULE_SENSORS: tuple[ModuleSensorDescription, ...] = (
         state_class=SensorStateClass.TOTAL_INCREASING,
         entity_category=EntityCategory.DIAGNOSTIC,
         value_fn=lambda m: m.stat.cycles if m.stat else None,
+        exists_fn=lambda m: m.stat is not None,
+    ),
+    ModuleSensorDescription(
+        key="soh",
+        translation_key="soh",
+        native_unit_of_measurement=PERCENTAGE,
+        state_class=SensorStateClass.MEASUREMENT,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        value_fn=lambda m: m.stat.soh if m.stat else None,
+        exists_fn=lambda m: m.stat is not None,
     ),
 )
 
@@ -206,7 +218,11 @@ async def async_setup_entry(
         for address, module in coordinator.data.modules.items():
             if address not in known_modules:
                 known_modules.add(address)
-                new.extend(ModuleSensor(coordinator, d, address) for d in MODULE_SENSORS)
+                new.extend(
+                    ModuleSensor(coordinator, d, address)
+                    for d in MODULE_SENSORS
+                    if d.exists_fn(module)
+                )
             for cell in module.cells:
                 if (address, cell.index) not in known_cells:
                     known_cells.add((address, cell.index))

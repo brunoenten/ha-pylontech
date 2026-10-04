@@ -62,9 +62,9 @@ class PylontechCoordinator(DataUpdateCoordinator[StackData]):
         self.cell_poll_every: int = options.get(CONF_CELL_POLL_EVERY, DEFAULT_CELL_POLL_EVERY)
         self.stat_poll_every: int = options.get(CONF_STAT_POLL_EVERY, DEFAULT_STAT_POLL_EVERY)
         self.master: ModuleInfo | None = None
+        self.stack_device_id: str | None = None
         self.raw: dict[str, str] = {}
         self._cycle = 0
-        self._module_info: dict[int, ModuleInfo | None] = {}
         self._cells: dict[int, list[CellData]] = {}
         self._stats: dict[int, StatData] = {}
         self._bms_time: datetime | None = None
@@ -80,12 +80,8 @@ class PylontechCoordinator(DataUpdateCoordinator[StackData]):
         except (ConsoleError, ParseError) as err:
             raise UpdateFailed(f"Cannot read battery info: {err}") from err
 
-    async def _module_command(self, cmd: str, address: int) -> str:
-        """Run `cmd N`, falling back to plain `cmd` for the master module."""
-        raw = await self._command(f"{cmd} {address}")
-        if self.master and address == self.master.address and "Invalid" in raw:
-            raw = await self._command(cmd)
-        return raw
+    def _is_master(self, address: int) -> bool:
+        return self.master is not None and address == (self.master.address or 1)
 
     async def _async_update_data(self) -> StackData:
         try:
@@ -103,20 +99,19 @@ class PylontechCoordinator(DataUpdateCoordinator[StackData]):
 
         modules: dict[int, ModuleData] = {}
         for address, row in rows.items():
-            if address not in self._module_info:
-                self._module_info[address] = await self._read_info(address)
+            is_master = self._is_master(address)
             if poll_cells or address not in self._cells:
                 try:
-                    self._cells[address] = parse_bat(await self._module_command("bat", address))
+                    self._cells[address] = parse_bat(await self._command(f"bat {address}"))
                 except ParseError as err:
                     _LOGGER.debug("No cell data for module %s: %s", address, err)
                     self._cells.setdefault(address, [])
-            if poll_stat or address not in self._stats:
-                self._stats[address] = parse_stat(await self._module_command("stat", address))
+            if is_master and (poll_stat or address not in self._stats):
+                self._stats[address] = parse_stat(await self._command("stat"))
             modules[address] = ModuleData(
                 address=address,
                 power=row,
-                info=self._module_info[address],
+                info=self.master if is_master else None,
                 cells=self._cells.get(address, []),
                 stat=self._stats.get(address),
             )
@@ -126,15 +121,6 @@ class PylontechCoordinator(DataUpdateCoordinator[StackData]):
 
         self._cycle += 1
         return StackData(master=self.master, modules=modules, bms_time=self._bms_time)
-
-    async def _read_info(self, address: int) -> ModuleInfo | None:
-        if self.master and address == self.master.address:
-            return self.master
-        try:
-            return parse_info(await self._command(f"info {address}"))
-        except ParseError:
-            _LOGGER.debug("No info for module %s", address)
-            return None
 
     async def async_sync_time(self) -> None:
         """Set the BMS clock to Home Assistant's local time."""

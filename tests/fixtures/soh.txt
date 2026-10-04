@@ -1,0 +1,22 @@
+soh 1
+@
+Power   1
+Battery    Voltage    SOHCount   SOHStatus 
+0          3350       0          Normal    
+1          3349       0          Normal    
+2          3349       0          Normal    
+3          3348       0          Normal    
+4          3348       0          Normal    
+5          3349       0          Normal    
+6          3349       0          Normal    
+7          3349       0          Normal    
+8          3349       0          Normal    
+9          3349       0          Normal    
+10         3349       0          Normal    
+11         3349       0          Normal    
+12         3349       0          Normal    
+13         3348       0          Normal    
+14         3348       0          Normal    
+Command completed successfully
+$$
+pylon>

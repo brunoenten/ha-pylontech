@@ -211,8 +211,10 @@ def parse_stat(raw: str) -> StatData:
     """Parse `stat` output."""
     kv = _key_values(raw)
     cycles = kv.get("cycle times")
+    soh = kv.get("soh")
     return StatData(
         cycles=int(cycles) if cycles and cycles.isdigit() else None,
+        soh=int(soh) if soh and soh.isdigit() else None,
         raw=kv,
     )
 
