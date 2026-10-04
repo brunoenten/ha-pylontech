@@ -90,7 +90,8 @@ class PylontechConsole:
         if buffer is not None:
             buffer.clear()
 
-    async def _read_until_prompt(self, timeout: float) -> bytes:
+    async def _read_until_prompt(self, timeout: float, echo: bytes | None = None) -> bytes:
+        """Read until the prompt; with `echo`, ignore prompts before the command echo."""
         assert self._reader is not None
         loop = asyncio.get_running_loop()
         deadline = loop.time() + timeout
@@ -116,8 +117,14 @@ class PylontechConsole:
                 deadline = loop.time() + timeout
                 continue
             scanned = max(scanned, len(data) - len(_CONTINUE_MARKER))
-            if _PROMPT_RE.search(bytes(data[-64:])):
+            if not _PROMPT_RE.search(bytes(data[-64:])):
+                continue
+            if echo is None:
                 return bytes(data)
+            start = data.find(echo)
+            if start < 0 and b"$$" not in data:
+                continue
+            return bytes(data[max(start, 0) :])
 
     async def command(self, cmd: str, timeout: float | None = None) -> str:
         """Send a command and return the raw response text."""
@@ -127,7 +134,10 @@ class PylontechConsole:
                     await self._connect()
                     self._drain()
                     self._write(cmd.encode("ascii") + b"\r")
-                    raw = await self._read_until_prompt(timeout or self.timeout)
+                    raw = await self._read_until_prompt(
+                        timeout or self.timeout, echo=cmd.encode("ascii")
+                    )
+                    _LOGGER.debug("Response to %r: %r", cmd, raw)
                     return raw.decode("ascii", errors="replace")
                 except (ConsoleError, OSError, serialx.SerialException) as err:
                     _LOGGER.debug("Command %r failed (attempt %s): %s", cmd, attempt, err)

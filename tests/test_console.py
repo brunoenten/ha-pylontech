@@ -56,6 +56,15 @@ async def test_command_reads_until_prompt() -> None:
     assert raw.rstrip().endswith("pylon>")
 
 
+async def test_command_ignores_stale_prompt() -> None:
+    pwr = load_fixture("pwr.txt").encode()
+    patcher, _ = _patch({b"\r": [PROMPT], b"pwr\r": [PROMPT, pwr]})
+    with patcher:
+        raw = await PylontechConsole("/dev/null").command("pwr")
+    assert raw.startswith("pwr")
+    assert "Absent" in raw
+
+
 async def test_command_handles_pagination() -> None:
     page1 = load_fixture("help_page1.txt").encode()
     page2 = b"\r\nremote cmd\r\nCommand completed successfully\r\n$$" + PROMPT

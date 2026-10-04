@@ -94,6 +94,20 @@ async def test_setup_stack(hass: HomeAssistant, mock_console) -> None:
     assert not any(cmd.startswith(("info ", "stat ")) for cmd in sent)
 
 
+@pytest.mark.parametrize("pwr_fixture", ["pwr_stack.txt"])
+async def test_remove_stale_module_device(hass: HomeAssistant, mock_console) -> None:
+    from custom_components.pylontech_us import async_remove_config_entry_device
+
+    entry = await _setup(hass)
+    devices = _devices(hass, entry)
+    stale = dr.async_get(hass).async_get_or_create(
+        config_entry_id=entry.entry_id, identifiers={(DOMAIN, f"{UNIQUE_ID}_4")}
+    )
+    assert await async_remove_config_entry_device(hass, entry, stale)
+    assert not await async_remove_config_entry_device(hass, entry, devices[f"{UNIQUE_ID}_3"])
+    assert not await async_remove_config_entry_device(hass, entry, devices[UNIQUE_ID])
+
+
 async def test_sync_time_button(hass: HomeAssistant, mock_console) -> None:
     await _setup(hass)
     entity_id = er.async_get(hass).async_get_entity_id("button", DOMAIN, f"{UNIQUE_ID}_sync_time")

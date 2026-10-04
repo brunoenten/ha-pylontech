@@ -6,8 +6,9 @@ from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import device_registry as dr
 
+from .const import DOMAIN
 from .coordinator import PylontechConfigEntry, PylontechCoordinator
-from .entity import stack_device_info
+from .entity import stack_device_info, stack_id
 
 PLATFORMS = [Platform.BINARY_SENSOR, Platform.BUTTON, Platform.SENSOR]
 
@@ -36,6 +37,24 @@ async def async_unload_entry(hass: HomeAssistant, entry: PylontechConfigEntry) -
     if unloaded:
         await entry.runtime_data.console.close()
     return unloaded
+
+
+async def async_remove_config_entry_device(
+    hass: HomeAssistant, entry: PylontechConfigEntry, device: dr.DeviceEntry
+) -> bool:
+    """Allow removing module devices that are no longer reported by the master."""
+    coordinator = entry.runtime_data
+    stack = stack_id(coordinator)
+    modules = coordinator.data.modules if coordinator.data else {}
+    for domain, identifier in device.identifiers:
+        if domain != DOMAIN:
+            continue
+        if identifier == stack:
+            return False
+        address = identifier.removeprefix(f"{stack}_")
+        if address.isdigit() and int(address) in modules:
+            return False
+    return True
 
 
 async def _async_update_listener(hass: HomeAssistant, entry: PylontechConfigEntry) -> None:
