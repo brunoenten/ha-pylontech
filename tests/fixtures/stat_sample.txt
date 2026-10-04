@@ -1,0 +1,23 @@
+stat 1
+@
+Device address      : 1
+Data Items          : 1234
+Charge Cnt.         : 512
+Discharge Cnt.      : 498
+Charge Times        : 430
+Idle Times          : 12
+Shut Times          : 3
+Reset Times         : 7
+COC Times           : 0
+DOC Times           : 0
+PWR COC Times       : 0
+PWR DOC Times       : 0
+OV Times            : 0
+UV Times            : 0
+CYCLE Times         : 430
+SOH Times           : 0
+Pwr Percent         : 89
+Command completed successfully
+$$
+
+pylon>

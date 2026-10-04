@@ -1,0 +1,13 @@
+{
+  "domain": "pylontech_us",
+  "name": "Pylontech US (console)",
+  "codeowners": [],
+  "config_flow": true,
+  "documentation": "https://github.com/bruno/ha-pylontech",
+  "integration_type": "hub",
+  "iot_class": "local_polling",
+  "issue_tracker": "https://github.com/bruno/ha-pylontech/issues",
+  "loggers": ["custom_components.pylontech_us"],
+  "requirements": ["serialx>=1.8.2"],
+  "version": "0.1.0"
+}

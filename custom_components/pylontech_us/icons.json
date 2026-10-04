@@ -1,0 +1,25 @@
+{
+  "entity": {
+    "binary_sensor": {
+      "alarm": { "default": "mdi:battery-check", "state": { "on": "mdi:battery-alert" } }
+    },
+    "button": {
+      "sync_time": { "default": "mdi:clock-check-outline" }
+    },
+    "sensor": {
+      "state": {
+        "default": "mdi:battery",
+        "state": {
+          "charging": "mdi:battery-charging",
+          "discharging": "mdi:battery-minus",
+          "idle": "mdi:battery",
+          "balancing": "mdi:scale-balance"
+        }
+      },
+      "module_count": { "default": "mdi:battery-multiple" },
+      "cycles": { "default": "mdi:battery-sync" },
+      "cell_voltage_delta": { "default": "mdi:delta" },
+      "bms_time": { "default": "mdi:clock-outline" }
+    }
+  }
+}

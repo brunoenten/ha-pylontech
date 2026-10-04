@@ -1,0 +1,12 @@
+pwr
+@
+
+Power Volt   Curr   Tempr  Tlow   Thigh  Vlow   Vhigh  Base.St  Volt.St  Curr.St  Temp.St  Coulomb  Time                 B.V.St   B.T.St   MosTempr M.T.St   
+1     49735  -1250  21000  20000  21000  3313   3318   Dischg   Normal   Normal   Normal   67%      2026-10-04 15:00:00  Normal   Normal   22000    Normal  
+2     49740  -1180  20000  19000  20000  3314   3320   Dischg   Normal   Normal   Normal   66%      2026-10-04 15:00:00  Normal   Normal   21000    Normal  
+3     -      -      -      -      -      -      -      Absent   -        -        -        -        -                    -        -        -        -       
+4     -      -      -      -      -      -      -      Absent   -        -        -        -        -                    -        -        -        -       
+Command completed successfully
+$$
+
+pylon>

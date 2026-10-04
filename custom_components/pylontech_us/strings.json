@@ -1,0 +1,76 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Pylontech US console",
+        "description": "Select the serial port connected to the master battery's RS232 console port.",
+        "data": {
+          "serial_port": "Serial port",
+          "baud_rate": "Baud rate"
+        },
+        "data_description": {
+          "serial_port": "Prefer a /dev/serial/by-id path so the port survives reboots.",
+          "baud_rate": "US2000C, US3000 and US5000 consoles use 115200."
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "No console prompt received. Check the cable, baud rate and that the battery is switched on.",
+      "invalid_response": "The device answered but the response was not recognised as a Pylontech console."
+    },
+    "abort": {
+      "already_configured": "This battery or serial port is already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "data": {
+          "scan_interval": "Polling interval",
+          "cell_poll_every": "Read cell data every N polls",
+          "stat_poll_every": "Read statistics and BMS clock every N polls"
+        },
+        "data_description": {
+          "cell_poll_every": "0 disables per-cell polling after the first read.",
+          "stat_poll_every": "0 disables statistics polling after the first read."
+        }
+      }
+    }
+  },
+  "entity": {
+    "binary_sensor": {
+      "alarm": { "name": "Alarm" }
+    },
+    "button": {
+      "sync_time": { "name": "Sync BMS clock" }
+    },
+    "sensor": {
+      "voltage": { "name": "Voltage" },
+      "current": { "name": "Current" },
+      "power": { "name": "Power" },
+      "soc": { "name": "State of charge" },
+      "temperature": { "name": "Temperature" },
+      "temperature_low": { "name": "Lowest temperature" },
+      "temperature_high": { "name": "Highest temperature" },
+      "mos_temperature": { "name": "MOSFET temperature" },
+      "cell_voltage_low": { "name": "Lowest cell voltage" },
+      "cell_voltage_high": { "name": "Highest cell voltage" },
+      "cell_voltage_delta": { "name": "Cell voltage delta" },
+      "module_count": { "name": "Modules" },
+      "bms_time": { "name": "BMS clock" },
+      "cycles": { "name": "Cycles" },
+      "cell_voltage": { "name": "Cell {cell} voltage" },
+      "cell_temperature": { "name": "Cell {cell} temperature" },
+      "state": {
+        "name": "State",
+        "state": {
+          "charging": "Charging",
+          "discharging": "Discharging",
+          "idle": "Idle",
+          "balancing": "Balancing",
+          "other": "Other"
+        }
+      }
+    }
+  }
+}
