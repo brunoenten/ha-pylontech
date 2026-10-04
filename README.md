@@ -37,6 +37,10 @@ Options:
 - **Read cell data every N polls** (default 4): `bat` per module.
 - **Read statistics and BMS clock every N polls** (default 20): `stat` per module and `time`.
 
+## Dashboard
+
+[`examples/dashboard.yaml`](examples/dashboard.yaml) is a ready-made dashboard (built-in cards only) with stack gauges, per-module status, alarms, maintenance and history. Paste it into a new dashboard's raw configuration editor and adjust entity IDs and module count to your stack.
+
 ## Energy dashboard
 
 The integration does not keep energy counters. Create two *Integral* helpers (Riemann sum, left method) on a template sensor that splits the stack power into charge (positive) and discharge (negative) parts, then use them in the Energy dashboard as battery in/out.

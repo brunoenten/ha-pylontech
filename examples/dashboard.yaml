@@ -1,0 +1,354 @@
+# Battery stack dashboard: Settings > Dashboards > Add dashboard > New dashboard from scratch,
+# then open it, Edit dashboard > three dots > Raw configuration editor, and paste this.
+# Entity IDs assume a US2000C master and 7 modules; adjust to your stack.
+title: Battery
+views:
+- title: Battery stack
+  path: stack
+  icon: mdi:home-battery
+  type: sections
+  max_columns: 3
+  sections:
+  - type: grid
+    cards:
+    - type: heading
+      heading: Stack
+      icon: mdi:battery-high
+    - type: gauge
+      entity: sensor.pylontech_us2000c_state_of_charge
+      name: State of charge
+      min: 0
+      max: 100
+      severity: &id001
+        red: 0
+        yellow: 20
+        green: 40
+      needle: true
+    - type: gauge
+      entity: sensor.pylontech_us2000c_power
+      name: Power
+      min: -3000
+      max: 3000
+      needle: true
+      segments:
+      - from: -3000
+        color: '#db4437'
+      - from: 0
+        color: '#43a047'
+    - type: tile
+      entity: sensor.pylontech_us2000c_voltage
+      name: Voltage
+    - type: tile
+      entity: sensor.pylontech_us2000c_current
+      name: Current
+    - type: tile
+      entity: sensor.pylontech_us2000c_lowest_cell_voltage
+      name: Lowest cell
+    - type: tile
+      entity: sensor.pylontech_us2000c_highest_cell_voltage
+      name: Highest cell
+    - type: tile
+      entity: sensor.pylontech_us2000c_lowest_temperature
+      name: Lowest temp.
+    - type: tile
+      entity: sensor.pylontech_us2000c_highest_temperature
+      name: Highest temp.
+    - type: tile
+      entity: sensor.pylontech_us2000c_modules
+      name: Modules
+    - type: heading
+      heading: Maintenance
+      icon: mdi:wrench-outline
+    - type: entity-filter
+      entities:
+      - binary_sensor.pylontech_module_1_alarm
+      - binary_sensor.pylontech_module_2_alarm
+      - binary_sensor.pylontech_module_3_alarm
+      - binary_sensor.pylontech_module_4_alarm
+      - binary_sensor.pylontech_module_5_alarm
+      - binary_sensor.pylontech_module_6_alarm
+      - binary_sensor.pylontech_module_7_alarm
+      conditions:
+      - condition: state
+        state: 'on'
+      show_empty: false
+      card:
+        type: entities
+        title: Active alarms
+    - type: tile
+      entity: sensor.pylontech_module_1_state_of_health
+      name: Master SOH
+    - type: tile
+      entity: sensor.pylontech_module_1_cycles
+      name: Master cycles
+    - type: button
+      entity: button.pylontech_us2000c_sync_bms_clock
+      name: Sync BMS clock
+      icon: mdi:clock-check-outline
+      show_state: false
+      tap_action:
+        action: perform-action
+        perform_action: button.press
+        target:
+          entity_id: button.pylontech_us2000c_sync_bms_clock
+        confirmation:
+          text: Set the BMS clock to Home Assistant time?
+      grid_options:
+        columns: 6
+        rows: 2
+  - type: grid
+    column_span: 2
+    cards:
+    - type: heading
+      heading: Modules
+      icon: mdi:battery-multiple
+    - type: gauge
+      entity: sensor.pylontech_module_1_state_of_charge
+      name: Module 1
+      min: 0
+      max: 100
+      severity: *id001
+      grid_options:
+        columns: 3
+        rows: 2
+    - type: gauge
+      entity: sensor.pylontech_module_2_state_of_charge
+      name: Module 2
+      min: 0
+      max: 100
+      severity: *id001
+      grid_options:
+        columns: 3
+        rows: 2
+    - type: gauge
+      entity: sensor.pylontech_module_3_state_of_charge
+      name: Module 3
+      min: 0
+      max: 100
+      severity: *id001
+      grid_options:
+        columns: 3
+        rows: 2
+    - type: gauge
+      entity: sensor.pylontech_module_4_state_of_charge
+      name: Module 4
+      min: 0
+      max: 100
+      severity: *id001
+      grid_options:
+        columns: 3
+        rows: 2
+    - type: gauge
+      entity: sensor.pylontech_module_5_state_of_charge
+      name: Module 5
+      min: 0
+      max: 100
+      severity: *id001
+      grid_options:
+        columns: 3
+        rows: 2
+    - type: gauge
+      entity: sensor.pylontech_module_6_state_of_charge
+      name: Module 6
+      min: 0
+      max: 100
+      severity: *id001
+      grid_options:
+        columns: 3
+        rows: 2
+    - type: gauge
+      entity: sensor.pylontech_module_7_state_of_charge
+      name: Module 7
+      min: 0
+      max: 100
+      severity: *id001
+      grid_options:
+        columns: 3
+        rows: 2
+    - type: glance
+      title: State
+      columns: 7
+      show_icon: false
+      entities:
+      - entity: sensor.pylontech_module_1_state
+        name: Module 1
+      - entity: sensor.pylontech_module_2_state
+        name: Module 2
+      - entity: sensor.pylontech_module_3_state
+        name: Module 3
+      - entity: sensor.pylontech_module_4_state
+        name: Module 4
+      - entity: sensor.pylontech_module_5_state
+        name: Module 5
+      - entity: sensor.pylontech_module_6_state
+        name: Module 6
+      - entity: sensor.pylontech_module_7_state
+        name: Module 7
+      grid_options:
+        columns: full
+    - type: glance
+      title: Power
+      columns: 7
+      show_icon: false
+      entities:
+      - entity: sensor.pylontech_module_1_power
+        name: Module 1
+      - entity: sensor.pylontech_module_2_power
+        name: Module 2
+      - entity: sensor.pylontech_module_3_power
+        name: Module 3
+      - entity: sensor.pylontech_module_4_power
+        name: Module 4
+      - entity: sensor.pylontech_module_5_power
+        name: Module 5
+      - entity: sensor.pylontech_module_6_power
+        name: Module 6
+      - entity: sensor.pylontech_module_7_power
+        name: Module 7
+      grid_options:
+        columns: full
+    - type: glance
+      title: Current
+      columns: 7
+      show_icon: false
+      entities:
+      - entity: sensor.pylontech_module_1_current
+        name: Module 1
+      - entity: sensor.pylontech_module_2_current
+        name: Module 2
+      - entity: sensor.pylontech_module_3_current
+        name: Module 3
+      - entity: sensor.pylontech_module_4_current
+        name: Module 4
+      - entity: sensor.pylontech_module_5_current
+        name: Module 5
+      - entity: sensor.pylontech_module_6_current
+        name: Module 6
+      - entity: sensor.pylontech_module_7_current
+        name: Module 7
+      grid_options:
+        columns: full
+    - type: glance
+      title: Temperature
+      columns: 7
+      show_icon: false
+      entities:
+      - entity: sensor.pylontech_module_1_temperature
+        name: Module 1
+      - entity: sensor.pylontech_module_2_temperature
+        name: Module 2
+      - entity: sensor.pylontech_module_3_temperature
+        name: Module 3
+      - entity: sensor.pylontech_module_4_temperature
+        name: Module 4
+      - entity: sensor.pylontech_module_5_temperature
+        name: Module 5
+      - entity: sensor.pylontech_module_6_temperature
+        name: Module 6
+      - entity: sensor.pylontech_module_7_temperature
+        name: Module 7
+      grid_options:
+        columns: full
+    - type: glance
+      title: Cell voltage delta
+      columns: 7
+      show_icon: false
+      entities:
+      - entity: sensor.pylontech_module_1_cell_voltage_delta
+        name: Module 1
+      - entity: sensor.pylontech_module_2_cell_voltage_delta
+        name: Module 2
+      - entity: sensor.pylontech_module_3_cell_voltage_delta
+        name: Module 3
+      - entity: sensor.pylontech_module_4_cell_voltage_delta
+        name: Module 4
+      - entity: sensor.pylontech_module_5_cell_voltage_delta
+        name: Module 5
+      - entity: sensor.pylontech_module_6_cell_voltage_delta
+        name: Module 6
+      - entity: sensor.pylontech_module_7_cell_voltage_delta
+        name: Module 7
+      grid_options:
+        columns: full
+    - type: glance
+      title: Alarms
+      columns: 7
+      show_icon: false
+      entities:
+      - entity: binary_sensor.pylontech_module_1_alarm
+        name: Module 1
+      - entity: binary_sensor.pylontech_module_2_alarm
+        name: Module 2
+      - entity: binary_sensor.pylontech_module_3_alarm
+        name: Module 3
+      - entity: binary_sensor.pylontech_module_4_alarm
+        name: Module 4
+      - entity: binary_sensor.pylontech_module_5_alarm
+        name: Module 5
+      - entity: binary_sensor.pylontech_module_6_alarm
+        name: Module 6
+      - entity: binary_sensor.pylontech_module_7_alarm
+        name: Module 7
+      grid_options:
+        columns: full
+      state_color: true
+  - type: grid
+    column_span: 3
+    cards:
+    - type: heading
+      heading: History
+      icon: mdi:chart-line
+    - type: history-graph
+      title: Stack power
+      hours_to_show: 24
+      entities:
+      - entity: sensor.pylontech_us2000c_power
+        name: Power
+      grid_options:
+        columns: 18
+        rows: 4
+    - type: history-graph
+      title: State of charge
+      hours_to_show: 24
+      entities:
+      - entity: sensor.pylontech_us2000c_state_of_charge
+        name: Stack
+      - entity: sensor.pylontech_module_1_state_of_charge
+        name: Module 1
+      - entity: sensor.pylontech_module_2_state_of_charge
+        name: Module 2
+      - entity: sensor.pylontech_module_3_state_of_charge
+        name: Module 3
+      - entity: sensor.pylontech_module_4_state_of_charge
+        name: Module 4
+      - entity: sensor.pylontech_module_5_state_of_charge
+        name: Module 5
+      - entity: sensor.pylontech_module_6_state_of_charge
+        name: Module 6
+      - entity: sensor.pylontech_module_7_state_of_charge
+        name: Module 7
+      grid_options:
+        columns: 18
+        rows: 4
+    - type: history-graph
+      title: Cell voltage range
+      hours_to_show: 24
+      entities:
+      - entity: sensor.pylontech_us2000c_lowest_cell_voltage
+        name: Lowest
+      - entity: sensor.pylontech_us2000c_highest_cell_voltage
+        name: Highest
+      grid_options:
+        columns: 18
+        rows: 4
+    - type: history-graph
+      title: Temperature range
+      hours_to_show: 24
+      entities:
+      - entity: sensor.pylontech_us2000c_lowest_temperature
+        name: Lowest
+      - entity: sensor.pylontech_us2000c_highest_temperature
+        name: Highest
+      grid_options:
+        columns: 18
+        rows: 4

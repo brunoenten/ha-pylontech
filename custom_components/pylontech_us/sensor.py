@@ -154,7 +154,11 @@ MODULE_SENSORS: tuple[ModuleSensorDescription, ...] = (
     ModuleSensorDescription(**_voltage("cell_voltage_high"),
                             value_fn=lambda m: m.power.cell_voltage_high),
     ModuleSensorDescription(
-        **_voltage("cell_voltage_delta"),
+        **_voltage(
+            "cell_voltage_delta",
+            suggested_unit_of_measurement=UnitOfElectricPotential.MILLIVOLT,
+            suggested_display_precision=0,
+        ),
         value_fn=lambda m: round(m.power.cell_voltage_high - m.power.cell_voltage_low, 3)
         if m.power.cell_voltage_high is not None and m.power.cell_voltage_low is not None
         else None,
