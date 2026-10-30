@@ -18,10 +18,16 @@ def load_fixture(name: str) -> str:
     return (FIXTURES / name).read_text()
 
 
-def make_responder(pwr_fixture: str = "pwr.txt") -> Callable[[str], str]:
-    """Return a fake `PylontechConsole.command` answering from captured output."""
+def make_responder(
+    pwr_fixture: str = "pwr.txt", module_commands: bool = False
+) -> Callable[..., str]:
+    """Return a fake `PylontechConsole.command` answering from captured output.
 
-    def respond(cmd: str) -> str:
+    With `module_commands`, `info N` / `stat N` are answered for linked modules
+    (US5000 firmware B69.x); otherwise they time out like on older consoles.
+    """
+
+    def respond(cmd: str, timeout: float | None = None) -> str:
         base, *args = cmd.split()
         if base not in COMMANDS:
             return f"{cmd}\r\n@\r\nInvalid command\r\n$$\r\n\rpylon>"
@@ -30,6 +36,8 @@ def make_responder(pwr_fixture: str = "pwr.txt") -> Callable[[str], str]:
         if base == "pwr":
             return load_fixture(pwr_fixture)
         if base in ("info", "stat") and args and args[0] != "1":
+            if module_commands:
+                return load_fixture(f"{base}_slave.txt")
             raise ConsoleError(f"Timeout waiting for prompt after {cmd!r}")
         if base == "bat" and args and args[0] != "1":
             return load_fixture("bat_slave.txt")
@@ -49,11 +57,16 @@ def pwr_fixture() -> str:
 
 
 @pytest.fixture
-def mock_console(pwr_fixture: str) -> Generator:
+def module_commands() -> bool:
+    return False
+
+
+@pytest.fixture
+def mock_console(pwr_fixture: str, module_commands: bool) -> Generator:
     with (
         patch(
             "custom_components.pylontech_us.console.PylontechConsole.command",
-            side_effect=make_responder(pwr_fixture),
+            side_effect=make_responder(pwr_fixture, module_commands),
         ) as mock,
         patch("custom_components.pylontech_us.console.PylontechConsole.close", return_value=None),
     ):

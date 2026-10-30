@@ -36,6 +36,9 @@ from .parser import (
 
 _LOGGER = logging.getLogger(__name__)
 
+# Timeout for the first `info N`, consoles without per-module commands never answer it.
+_PROBE_TIMEOUT = 2.0
+
 type PylontechConfigEntry = ConfigEntry[PylontechCoordinator]
 
 
@@ -67,12 +70,35 @@ class PylontechCoordinator(DataUpdateCoordinator[StackData]):
         self._cycle = 0
         self._cells: dict[int, list[CellData]] = {}
         self._stats: dict[int, StatData] = {}
+        self._infos: dict[int, ModuleInfo | None] = {}
+        # Whether the console answers `info N` / `stat N` for linked modules
+        # (None until probed on the first linked module).
+        self._module_commands: bool | None = None
         self._bms_time: datetime | None = None
 
-    async def _command(self, cmd: str) -> str:
-        raw = await self.console.command(cmd)
+    async def _command(self, cmd: str, timeout: float | None = None) -> str:
+        raw = await self.console.command(cmd, timeout)
         self.raw[cmd] = raw
         return raw
+
+    async def _module_info(self, address: int) -> ModuleInfo | None:
+        """Read `info N` for a linked module, probing console support on first use."""
+        if self._module_commands is False:
+            return None
+        probing = self._module_commands is None
+        try:
+            info = parse_info(
+                await self._command(f"info {address}", _PROBE_TIMEOUT if probing else None)
+            )
+        except (ConsoleError, ParseError) as err:
+            if not probing:
+                _LOGGER.debug("No info for module %s: %s", address, err)
+                return None
+            _LOGGER.debug("Console does not answer per-module info/stat: %s", err)
+            self._module_commands = False
+            return None
+        self._module_commands = True
+        return info
 
     async def _async_setup(self) -> None:
         try:
@@ -106,12 +132,17 @@ class PylontechCoordinator(DataUpdateCoordinator[StackData]):
                 except ParseError as err:
                     _LOGGER.debug("No cell data for module %s: %s", address, err)
                     self._cells.setdefault(address, [])
-            if is_master and (poll_stat or address not in self._stats):
-                self._stats[address] = parse_stat(await self._command("stat"))
+            if not is_master and address not in self._infos:
+                self._infos[address] = await self._module_info(address)
+            if poll_stat or address not in self._stats:
+                if is_master:
+                    self._stats[address] = parse_stat(await self._command("stat"))
+                elif self._module_commands:
+                    self._stats[address] = parse_stat(await self._command(f"stat {address}"))
             modules[address] = ModuleData(
                 address=address,
                 power=row,
-                info=self.master if is_master else None,
+                info=self.master if is_master else self._infos.get(address),
                 cells=self._cells.get(address, []),
                 stat=self._stats.get(address),
             )
