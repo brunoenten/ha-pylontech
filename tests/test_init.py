@@ -91,7 +91,29 @@ async def test_setup_stack(hass: HomeAssistant, mock_console) -> None:
 
     sent = [call.args[0] for call in mock_console.call_args_list]
     assert "bat 3" in sent
-    assert not any(cmd.startswith(("info ", "stat ")) for cmd in sent)
+    # Probed once on the first linked module, then never retried.
+    assert [cmd for cmd in sent if cmd.startswith(("info ", "stat "))] == ["info 2"]
+
+    await entry.runtime_data.async_refresh()
+    sent = [call.args[0] for call in mock_console.call_args_list]
+    assert [cmd for cmd in sent if cmd.startswith(("info ", "stat "))] == ["info 2"]
+
+
+@pytest.mark.parametrize(("pwr_fixture", "module_commands"), [("pwr_stack.txt", True)])
+async def test_setup_stack_module_commands(hass: HomeAssistant, mock_console) -> None:
+    entry = await _setup(hass)
+    devices = _devices(hass, entry)
+    assert devices[f"{UNIQUE_ID}_3"].serial_number == "Y241202C51201173"
+    assert devices[f"{UNIQUE_ID}_3"].model == "US5000"
+    assert devices[f"{UNIQUE_ID}_3"].sw_version == "B69.25.0.0 / V2.0"
+    assert _state(hass, "sensor", f"{UNIQUE_ID}_3_cycles") == "219"
+    assert _state(hass, "sensor", f"{UNIQUE_ID}_3_soh") == "98"
+    assert _state(hass, "sensor", f"{UNIQUE_ID}_1_cycles") == "1157"
+
+    sent = [call.args[0] for call in mock_console.call_args_list]
+    assert {"info 2", "info 3", "stat 2", "stat 3"} <= set(sent)
+    assert "info 1" not in sent
+    assert "stat 1" not in sent
 
 
 @pytest.mark.parametrize("pwr_fixture", ["pwr_stack.txt"])
